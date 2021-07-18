@@ -135,7 +135,7 @@ window.sss.string_to_slug = function(str) {
       str = str.toLowerCase();
 
       // remove accents, swap Ã± for n, etc
-      var from = "Ã Ã¡Ã¤Ã¢Ã¨Ã©Ã«ÃªÃ¬Ã­Ã¯Ã®Ã²Ã³Ã¶Ã´Ã¹ÃºÃ¼Ã»Ã±Ã§Â·/_,:;";
+      var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
       var to = "aaaaeeeeiiiioooouuuunc------";
       for (var i=0, l=from.length; i<l; i++) {
           str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
