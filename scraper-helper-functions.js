@@ -134,8 +134,8 @@ window.sss.string_to_slug = function(str) {
       str = str.replace(/^\s+|\s+$/g, ''); // trim
       str = str.toLowerCase();
 
-      // remove accents, swap ñ for n, etc
-      var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
+      // remove accents, swap Ã± for n, etc
+      var from = "Ã Ã¡Ã¤Ã¢Ã¨Ã©Ã«ÃªÃ¬Ã­Ã¯Ã®Ã²Ã³Ã¶Ã´Ã¹ÃºÃ¼Ã»Ã±Ã§Â·/_,:;";
       var to = "aaaaeeeeiiiioooouuuunc------";
       for (var i=0, l=from.length; i<l; i++) {
           str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
@@ -161,9 +161,14 @@ window.sss.addYouTubeCode = function(match) {
   jQuery('#sss-youtube-wrapper').append('<p>' + match + '</p>');
 }
 
-window.sss.addNewDocument = function(match) {
-  console.log(match);
-  jQuery('#sss-document-wrapper').append('<p>' + match + '</p>');
+window.sss.addNewDocument = function(matches) {
+  if (Array.isArray(matches)) {
+    matches.forEach(function(match){
+        jQuery('#sss-document-wrapper').append('<p>' + match + '</p>');
+    });
+  } else {
+    jQuery('#sss-document-wrapper').append('<p>' + matches + '</p>');
+  }
 }
 
 window.sss.addPoleDiameter = function(match) {
