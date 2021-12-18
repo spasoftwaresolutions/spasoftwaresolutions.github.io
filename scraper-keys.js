@@ -2,6 +2,7 @@ window.sss = window.sss || {};
 
 window.sss.features = [
     {"key":11,"values":["led light","l.e.d.","lighting"]},
+    {"key":15,"values":["cup holder"]},
     {"key":24,"values":["portable"]},
     {"key":36,"values":["color chang"]},
     {"key":37,"values":["legs"]},
@@ -23,14 +24,14 @@ window.sss.features = [
     {"key":54,"values":["curtain"]},
     {"key":55,"values":["folding"]},
     {"key":56,"values":["stacking","stackable","stacks","stack quantity","nest quantity"]},
-    {"key":57,"values":["reclin"]},
+    {"key":57,"values":["reclin", "lay-flat"]},
     {"key":58,"values":["uv protected"]},
     {"key":59,"values":["includles fire pit"]},
-    {"key":60,"values":["eco friendly"]},
+    {"key":60,"values":["eco friendly","eco-friendly","eco-weave"]},
     {"key":61,"values":["solid wood"]},
     {"key":62,"values":["arm ","arms"]},
     {"key":63,"values":["has storage"]},
-    {"key":64,"values":["powder coat","powder-coat"]},
+    {"key":64,"values":["powder coat","powder-coat","powdercoat"]},
     {"key":65,"values":["swiveling","swivel "]},
     {"key":66,"values":["rocking","rocker"]},
     {"key":67,"values":["cushioned","cushion ","padded", "pad "]},
@@ -43,7 +44,9 @@ window.sss.features = [
     {"key":76,"values":["gliding","glider"]},
     {"key":94,"values":["ada compliant","ada-compliant"]},
     {"key":95,"values":["wheels"]},
-    {"key":96,"values":["umbrella hole", "hole for umbrella"]},
+    {"key":96,"values":["umbrella hole", "hole for umbrella", "w/ hole"]},
+    {"key":127,"values":["ocean plastic","recycled"]},
+    {"key":128,"values":["deep seating","deep-seating"]},
 ];
 
 window.sss.categoryTypes = [
@@ -106,9 +109,18 @@ window.sss.categoryTypes = [
     {"key" : 80, "values" :	["spa chair"]},
     {"key" : 81, "values" :	["sand chair"]},
     {"key" : 82, "values" :	["cabana"]},
-    {"key" : 83, "values" :	["module"]},
+    {"key" : 83, "values" :	["module", "section"]},
     {"key" : 84, "values" :	["picnic table"]},
     {"key" : 85, "values" :	["spanner table"]},
+    {"key" : 117, "values" :	["cafe chair"]},
+    {"key" : 118, "values" :	["chat chair"]},
+    {"key" : 119, "values" :	["corner table"]},
+    {"key" : 120, "values" :	["pedestal table"]},
+    {"key" : 121, "values" :	["parsons table", "parson table"]},
+    {"key" : 122, "values" :	["chaise table"]},
+    {"key" : 123, "values" :	["balcony table"]},
+    {"key" : 124, "values" :	["director chair", "director's chair"]},
+    {"key" : 125, "values" :	["c-table", "c table"]},
 ];
 
 window.sss.frameMaterials = [
