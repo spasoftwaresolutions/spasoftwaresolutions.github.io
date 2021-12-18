@@ -9,6 +9,12 @@ Array.prototype.unique = function() {
     return a;
 };
 
+function toTitleCase(str) {
+    return str.replace(/\w\S*/g, function(txt){
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+}
+
 window.sss = window.sss || {};
 
 window.sss.updateQueryString = function(key, value, url) {
@@ -45,6 +51,15 @@ window.sss.updateQueryString = function(key, value, url) {
   }
 }
 
+window.sss.youTubeURLParser = function(url) {
+  if (!url) {
+    return null;
+  }
+  var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+  var match = url.match(regExp);
+  return (match&&match[7].length==11)? match[7] : null;
+}
+
 window.sss.addContainersAfterSelector = function(selector) {
     jQuery(selector).after('<p style="color:red">documents: </p> <div id="sss-document-wrapper"></div>');
     jQuery(selector).after('<p style="color:red">feature_id: </p> <div id="sss-feature-wrapper"></div>');
@@ -70,6 +85,12 @@ window.sss.addContainersAfterSelector = function(selector) {
     jQuery(selector).after('<p style="color:red">sub_model_name: </p> <div id="sss-sub-model-name-wrapper"></div>');
     jQuery(selector).after('<p style="color:red">sub_model_full_name: </p> <div id="sss-sub-model-full-name-wrapper"></div>');
     jQuery(selector).after('<p style="color:red">product_link_href: </p> <div id="sss-product-link-wrapper"></div>');
+    jQuery(selector).after('<p style="color:red">html_description: </p> <div id="sss-html-description-wrapper"></div>');
+    jQuery(selector).after('<p style="color:red">ignore_unit: </p> <div id="sss-ignore-unit"></div>');
+}
+
+window.sss.markIgnoreUnit = function() {
+  jQuery('#sss-ignore-unit').append('<p>ignore</p>');
 }
 
 window.sss.fetchFullModelSubNameByString = function(match) {
@@ -122,7 +143,7 @@ window.sss.searchTextForValuesAndReturnKeys = function(keyValuePairs, text) {
     let matchingKeys = [];
     keyValuePairs.forEach(function(item) {
         item.values.forEach(function(value) {
-            if (text.includes(value)) {
+            if (text.toLowerCase().includes(value.toLowerCase())) {
                 matchingKeys.push(item.key);
             }
         });
@@ -135,7 +156,7 @@ window.sss.string_to_slug = function(str) {
       str = str.toLowerCase();
 
       // remove accents, swap Ã± for n, etc
-      var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
+      var from = "Ã Ã¡Ã¤Ã¢Ã¨Ã©Ã«ÃªÃ¬Ã­Ã¯Ã®Ã²Ã³Ã¶Ã´Ã¹ÃºÃ¼Ã»Ã±Ã§Â·/_,:;";
       var to = "aaaaeeeeiiiioooouuuunc------";
       for (var i=0, l=from.length; i<l; i++) {
           str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
@@ -151,7 +172,7 @@ window.sss.string_to_slug = function(str) {
 window.sss.addNewPhotos = function(matches) {
       matches.forEach(function(match){
         let imageAlreadyExists = jQuery('#sss-photos-wrapper p:contains(' + match + ')').length;
-        if (!imageAlreadyExists) {
+        if (!imageAlreadyExists && match) {
           jQuery('#sss-photos-wrapper').append('<p>' + match + '</p>');
         }
       });
@@ -159,6 +180,11 @@ window.sss.addNewPhotos = function(matches) {
 
 window.sss.addYouTubeCode = function(match) {
   jQuery('#sss-youtube-wrapper').append('<p>' + match + '</p>');
+}
+
+window.sss.addYouTubeCodeByURL = function(match) {
+  let code = window.sss.youTubeURLParser(match);
+  window.sss.addYouTubeCode(code);
 }
 
 window.sss.addNewDocument = function(matches) {
@@ -343,26 +369,50 @@ window.sss.fetchDescriptionBySelectors = function(cssSelectors) {
       }
     });
 
-    jQuery('#sss-description-wrapper').text(html);
+    jQuery('#sss-html-description-wrapper').text(html);
   });
+}
+
+window.sss.addHTMLDescriptionByString = function(string) {
+    jQuery('#sss-html-description-wrapper').text(string);
+}
+
+window.sss.addDescriptionByString = function(string) {
+  jQuery('#sss-description-wrapper').text(string);
 }
 
 window.sss.fetchDimensions = function(height,width,depth,weight) {
       if (!width) {
           width = 0;
+      } else {
+        width = width.replace(/[^0-9.]/g, '');
       }
       if (!depth) {
           depth = 0;
+      } else {
+        depth = depth.replace(/[^0-9.]/g, '');
       }
       if (!height) {
         height = 0;
+      } else {
+        height = height.replace(/[^0-9.]/g, '');
       }
       if (!weight) {
         weight = 0;
+      } else {
+        weight = weight.replace(/[^0-9.]/g, '');
       }
-      jQuery('#sss-height-wrapper').append('<p>'+ height + '</p>');
-      jQuery('#sss-width-wrapper').append('<p>'+ Math.min(width,depth) + '</p>');
-      jQuery('#sss-length-wrapper').append('<p>'+ Math.max(width,depth) + '</p>');
+      let calculatedLength = Math.max(width,depth);
+      let calcualtedWidth = Math.min(width,depth);
+      if (height) {
+        jQuery('#sss-height-wrapper').append('<p>'+ height + '</p>');
+      }
+      if (calcualtedWidth) {
+        jQuery('#sss-width-wrapper').append('<p>'+ calcualtedWidth + '</p>');
+      }
+      if (calculatedLength) {
+        jQuery('#sss-length-wrapper').append('<p>'+ calculatedLength + '</p>');
+      }
       if (weight) {
           jQuery('#sss-weight-wrapper').append('<p>'+ weight + '</p>');
       }
