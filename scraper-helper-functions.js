@@ -9,12 +9,6 @@ Array.prototype.unique = function() {
     return a;
 };
 
-function toTitleCase(str) {
-    return str.replace(/\w\S*/g, function(txt){
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-    });
-}
-
 window.sss = window.sss || {};
 
 window.sss.updateQueryString = function(key, value, url) {
@@ -49,6 +43,24 @@ window.sss.updateQueryString = function(key, value, url) {
           return url;
       }
   }
+}
+
+window.sss.findStringBetween = function(start, stop, string) {
+  let value = string.split(start).pop().split(stop)[0];
+  return value.trim();
+}
+
+window.sss.toTitleCase = function(str) {
+    return str.replace(/\w\S*/g, function(txt){
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+}
+
+window.sss.getNumberFromString = function(string) {
+  if (!string) {
+    return '';
+  }
+  return string.replace(/[^0-9.]/g, '');
 }
 
 window.sss.youTubeURLParser = function(url) {
@@ -87,6 +99,12 @@ window.sss.addContainersAfterSelector = function(selector) {
     jQuery(selector).after('<p style="color:red">product_link_href: </p> <div id="sss-product-link-wrapper"></div>');
     jQuery(selector).after('<p style="color:red">html_description: </p> <div id="sss-html-description-wrapper"></div>');
     jQuery(selector).after('<p style="color:red">ignore_unit: </p> <div id="sss-ignore-unit"></div>');
+    jQuery(selector).after('<p style="color:red">model_number: </p> <div id="sss-model-number-wrapper"></div>');
+    jQuery(selector).after('<p style="color:red">seat_height_inches: </p> <div id="sss-seat-height-wrapper"></div>');
+    jQuery(selector).after('<p style="color:red">arm_height_inches: </p> <div id="sss-arm-height-wrapper"></div>');
+    jQuery(selector).after('<p style="color:red">seating_surface_id: </p> <div id="sss-seating-surface-wrapper"></div>');
+    jQuery(selector).after('<p style="color:red">btu: </p> <div id="sss-btu-wrapper"></div>');
+    jQuery(selector).after('<p style="color:red">ignition_type_id: </p> <div id="sss-ignition-types-wrapper"></div>');
 }
 
 window.sss.markIgnoreUnit = function() {
@@ -142,11 +160,27 @@ window.sss.fetchDataBySelectorAndAttribute = function(selector, attribute, nameS
 window.sss.searchTextForValuesAndReturnKeys = function(keyValuePairs, text) {
     let matchingKeys = [];
     keyValuePairs.forEach(function(item) {
-        item.values.forEach(function(value) {
-            if (text.toLowerCase().includes(value.toLowerCase())) {
-                matchingKeys.push(item.key);
+        if (item.avoid) {
+          item.values.forEach(function(value) {
+            let avoidItem = false;
+            item.avoid.forEach(function(avoidValue) {
+              if (text.toLowerCase().includes(avoidValue.toLowerCase())) {
+                  avoidItem = true;
+              }
+            });
+            if (!avoidItem) {
+              if (text.toLowerCase().includes(value.toLowerCase())) {
+                  matchingKeys.push(item.key);
+              }
             }
-        });
+          });
+        } else {
+          item.values.forEach(function(value) {
+              if (text.toLowerCase().includes(value.toLowerCase())) {
+                  matchingKeys.push(item.key);
+              }
+          });
+        }
     });
     return matchingKeys;
 }
@@ -250,12 +284,30 @@ window.sss.addNewFuelTypes = function(matches) {
       }
 }
 
+window.sss.addNewIgnitionTypes = function(matches) {
+      matches.forEach(function(match) {
+          jQuery('#sss-ignition-types-wrapper').append('<p>' + match + '</p>');
+      });
+      if (!matches.length) {
+        jQuery('#sss-ignition-types-wrapper').append('<p>null</p>');
+      }
+}
+
 window.sss.addNewExteriorMaterials = function(matches) {
       matches.forEach(function(match) {
           jQuery('#sss-exterior-materials-wrapper').append('<p>' + match + '</p>');
       });
       if (!matches.length) {
         jQuery('#sss-exterior-materials-wrapper').append('<p>null</p>');
+      }
+}
+
+window.sss.addNewSeatingSurfaces = function(matches) {
+      matches.forEach(function(match) {
+          jQuery('#sss-seating-surface-wrapper').append('<p>' + match + '</p>');
+      });
+      if (!matches.length) {
+        jQuery('#sss-seating-surface-wrapper').append('<p>1</p>'); // 6 is standard
       }
 }
 
@@ -348,6 +400,17 @@ window.sss.fetchFuelTypesByStrings = function(stringsArray) {
       window.sss.addNewFuelTypes(matches);
 }
 
+window.sss.fetchIgnitionTypesByStrings = function(stringsArray) {
+  let matches = [];
+  stringsArray.forEach(function(string){
+    let textMatches = window.sss.searchTextForValuesAndReturnKeys(window.sss.ignitionTypes, string);
+    if (textMatches.length) {
+        matches = matches.concat(textMatches).unique();
+    }
+  });
+  window.sss.addNewIgnitionTypes(matches);
+}
+
 window.sss.fetchShapesByStrings = function(stringsArray) {
       let matches = [];
       stringsArray.forEach(function(string){
@@ -381,26 +444,63 @@ window.sss.addDescriptionByString = function(string) {
   jQuery('#sss-description-wrapper').text(string);
 }
 
+window.sss.addModelNumberByString = function(string) {
+  jQuery('#sss-model-number-wrapper').text(string);
+}
+
+window.sss.addSeatHeightByString = function(string) {
+  if (string) {
+    let height = window.sss.getNumberFromString(string);
+    jQuery('#sss-seat-height-wrapper').append('<p>'+ height + '</p>');
+  }
+}
+
+window.sss.addArmHeightByString = function(string) {
+  if (string) {
+    let height = window.sss.getNumberFromString(string);
+    jQuery('#sss-arm-height-wrapper').append('<p>'+ height + '</p>');
+  }
+}
+
+window.sss.addBTUByString = function(string) {
+  if (string) {
+    let btu = window.sss.getNumberFromString(string);
+    jQuery('#sss-btu-wrapper').append('<p>'+ btu + '</p>');
+  }
+}
+
+window.sss.fetchSeatingSurfacesByStrings = function(stringsArray) {
+      let matches = [];
+      stringsArray.forEach(function(string){
+        let textMatches = window.sss.searchTextForValuesAndReturnKeys(window.sss.seatingSurfaces, string);
+        if (textMatches.length) {
+            matches = matches.concat(textMatches).unique();
+        }
+      });
+      window.sss.addNewSeatingSurfaces(matches);
+}
+
 window.sss.fetchDimensions = function(height,width,depth,weight) {
       if (!width) {
           width = 0;
       } else {
-        width = width.replace(/[^0-9.]/g, '');
+        width = window.sss.getNumberFromString(width);
       }
       if (!depth) {
           depth = 0;
       } else {
-        depth = depth.replace(/[^0-9.]/g, '');
+        depth = window.sss.getNumberFromString(depth);
       }
       if (!height) {
         height = 0;
       } else {
-        height = height.replace(/[^0-9.]/g, '');
+        height = window.sss.getNumberFromString(height);
       }
       if (!weight) {
         weight = 0;
       } else {
         weight = weight.replace(/[^0-9.]/g, '');
+        width = window.sss.getNumberFromString(width);
       }
       let calculatedLength = Math.max(width,depth);
       let calcualtedWidth = Math.min(width,depth);
