@@ -11,6 +11,8 @@ Array.prototype.unique = function() {
 
 window.sss = window.sss || {};
 
+window.sss.variants = {};
+
 window.sss.updateQueryString = function(key, value, url) {
   if (!url) url = window.location.href;
   var re = new RegExp("([?&])" + key + "=.*?(&|#|$)(.*)", "gi"),
@@ -76,7 +78,7 @@ window.sss.addContainersAfterSelector = function(selector) {
     jQuery(selector).after('<p style="color:red">documents: </p> <div id="sss-document-wrapper"></div>');
     jQuery(selector).after('<p style="color:red">feature_id: </p> <div id="sss-feature-wrapper"></div>');
     jQuery(selector).after('<p style="color:red">frame_material_id: </p> <div id="sss-frame-materials-wrapper"></div>');
-    jQuery(selector).after('<p style="color:red">exterior_material_id: </p> <div id="sss-exterior-materials-wrapper"></div>');
+    jQuery(selector).after('<p style="color:red">ext_material_id: </p> <div id="sss-exterior-materials-wrapper"></div>');
     jQuery(selector).after('<p style="color:red">shape_id: </p> <div id="sss-shapes-wrapper"></div>');
     jQuery(selector).after('<p style="color:red">category_type_id: </p> <div id="sss-category-types-wrapper"></div>');
     jQuery(selector).after('<p style="color:red">fuel_type_id: </p> <div id="sss-fuel-types-wrapper"></div>');
@@ -302,9 +304,22 @@ window.sss.addNewExteriorMaterials = function(matches) {
       }
 }
 
-window.sss.addNewSeatingSurfaces = function(matches) {
+window.sss.setupVariantPrefix = function(type, variant, string) {
+  if (!variant) {
+    return string;
+  }
+  if (typeof window.sss.variants[type] == 'undefined') {
+    window.sss.variants[type] = 0;
+  } else {
+    window.sss.variants[type] += 1;
+  }
+  return 'sssvariant-' + window.sss.variants[type] + '-' + string;
+}
+
+window.sss.addNewSeatingSurfaces = function(matches, variants) {
       matches.forEach(function(match) {
-          jQuery('#sss-seating-surface-wrapper').append('<p>' + match + '</p>');
+        let prefixedMatch = window.sss.setupVariantPrefix('seating-surface', variants, match);
+        jQuery('#sss-seating-surface-wrapper').append('<p>' + prefixedMatch + '</p>');
       });
       if (!matches.length) {
         jQuery('#sss-seating-surface-wrapper').append('<p>1</p>'); // 6 is standard
@@ -469,15 +484,15 @@ window.sss.addBTUByString = function(string) {
   }
 }
 
-window.sss.fetchSeatingSurfacesByStrings = function(stringsArray) {
-      let matches = [];
-      stringsArray.forEach(function(string){
-        let textMatches = window.sss.searchTextForValuesAndReturnKeys(window.sss.seatingSurfaces, string);
-        if (textMatches.length) {
-            matches = matches.concat(textMatches).unique();
-        }
-      });
-      window.sss.addNewSeatingSurfaces(matches);
+window.sss.fetchSeatingSurfacesByStrings = function(stringsArray, variants = false) {
+  let matches = [];
+  stringsArray.forEach(function(string){
+    let textMatches = window.sss.searchTextForValuesAndReturnKeys(window.sss.seatingSurfaces, string);
+    if (textMatches.length) {
+        matches = matches.concat(textMatches).unique();
+    }
+  });
+  window.sss.addNewSeatingSurfaces(matches, variants);
 }
 
 window.sss.fetchDimensions = function(height,width,depth,weight) {
